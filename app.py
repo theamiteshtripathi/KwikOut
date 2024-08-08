@@ -4,9 +4,12 @@ import googlemaps
 from datetime import datetime, timedelta
 
 # Set the Streamlit page configuration
-st.set_page_config(page_title="Exit Management System", page_icon="🚗")
+st.set_page_config(page_title="KwikOut", page_icon="🚗")
 st.markdown("<style>footer {visibility: hidden;}</style>", unsafe_allow_html=True)
 st.markdown("<style>header {visibility: hidden;}</style>", unsafe_allow_html=True)
+
+st.image("kwikout.png", width=100)
+
 
 # Set up MySQL connection
 def create_connection():
@@ -64,7 +67,7 @@ def get_navigation_link(destination):
     return directions[0]['overview_polyline']['points']
 
 # Streamlit UI
-st.title("🏁Exit Management System🏎️")
+st.title("🏁KwikOut: Exit Management System🏎️")
 
 # Signup/Login Form
 if "authenticated" not in st.session_state:
