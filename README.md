@@ -1,4 +1,3 @@
-```markdown
 # Exit Management System
 
 ## Overview
@@ -114,6 +113,3 @@ This project is licensed under the MIT License.
 
 ## Contact
 For any inquiries or issues, please contact [your-email@example.com](mailto:your-email@example.com).
-```
-
-Feel free to modify this `README.md` file to fit your project's specifics, such as the repository URL, contact email, and any additional instructions or features.
