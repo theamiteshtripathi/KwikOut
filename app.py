@@ -88,15 +88,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Display the KwikOut logo centered
-st.markdown(
-    """
-    <div class="center">
-        <img src="kwikout.png" alt="KwikOut Logo">
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# Create two empty columns and place the logo in the middle one
+col1, col2, col3 = st.columns([1, 2, 1])
+
+with col2:
+    st.image("kwikout.png", caption="KwikOut", width=150)
+
 
 # Title and description
 st.markdown('<div class="title">🏁KwikOut: Exit Management System🏎️</div>', unsafe_allow_html=True)
@@ -209,9 +206,36 @@ def get_navigation_link(destination):
         st.error(f"HTTP Error: {e}")
         return None
 
+# Sample data for restaurants (You can replace this with your actual data)
+restaurants = [
+    {"name": "Neptune Oyster", "image": "assets/restraunt1.jpeg", "discount": "10% OFF"},
+    {"name": "Union Oyster House", "image": "assets/restraunt2.jpeg", "discount": "15% OFF"},
+    {"name": "The Capital Grille", "image": "assets/restraunt3.jpeg", "discount": "Buy 1 Get 1 Free"},
+    {"name": "Lolita Cocina & Tequila Bar", "image": "assets/restraunt4.jpeg", "discount": "20% OFF"},
+    {"name": "Yvonne's", "image": "assets/restraunt5.jpeg", "discount": "Free Dessert with Meal"},
+    {"name": "Toro", "image": "assets/restraunt6.jpeg", "discount": "25% OFF"},
+    {"name": "Carmelina's", "image": "assets/restraunt7.jpeg", "discount": "30% OFF"},
+    {"name": "Mamma Maria", "image": "assets/restraunt8.jpeg", "discount": "40% OFF"},
+    {"name": "Ostra", "image": "assets/restraunt9.jpeg", "discount": "50% OFF"},
+    # Add more restaurants as needed
+]
+
+# Function to display the explore page with dynamic restaurant boxes and enhanced text visibility
+def explore_page():
+    st.title("Explore Restaurants and Coupons")
+
+    # Loop through the restaurants and display them in a 3-column layout
+    cols = st.columns(3)
+    for index, restaurant in enumerate(restaurants):
+        with cols[index % 3]:  # Distribute restaurants across three columns
+            st.image(restaurant['image'], width=200)
+            st.markdown(f"<h3 style='color: black;'>{restaurant['name']}</h3>", unsafe_allow_html=True)
+            st.markdown(f"<p style='color: black;'>{restaurant['discount']}</p>", unsafe_allow_html=True)
+
+
 
 # Page Navigation
-page = st.sidebar.selectbox("Navigate", ["Login", "Sign Up"])
+page = st.sidebar.selectbox("Navigate", ["Login", "Sign Up", "Queue Management", "Explore"])
 
 if page == "Login":
     st.markdown('<div class="header">Log In</div>', unsafe_allow_html=True)
@@ -236,6 +260,9 @@ elif page == "Sign Up":
     if st.button("Sign Up"):
         create_user(username, password)
         st.success("User created successfully!")
+
+elif page == "Explore":
+    explore_page()
 
 # Queue Management Page
 if st.session_state.get("authenticated", False) and st.session_state.page == "Queue Management":
