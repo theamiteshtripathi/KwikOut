@@ -130,14 +130,20 @@ def authenticate_user(username, password):
     conn.close()
     return user
 
-# Function to add user to exit queue
+# Function to add user to exit queue and reset status
 def add_to_queue(user_id, zone):
     conn = create_connection()
     cursor = conn.cursor()
+
+    # Reset the user's status to 'waiting' when they join the queue
+    cursor.execute("UPDATE exit_queue SET status = 'waiting' WHERE user_id = %s", (user_id,))
+    
     # Only consider users who are still waiting for the max queue number
     cursor.execute("SELECT MAX(queue_number) FROM exit_queue WHERE zone = %s AND status = 'waiting'", (zone,))
     max_queue_number = cursor.fetchone()[0]
     next_queue_number = (max_queue_number or 0) + 1
+    
+    # Insert the user into the queue with 'waiting' status
     cursor.execute("INSERT INTO exit_queue (user_id, queue_number, zone, status) VALUES (%s, %s, %s, 'waiting')", (user_id, next_queue_number, zone))
     conn.commit()
     conn.close()
@@ -182,7 +188,7 @@ def get_navigation_link(destination):
         st.write(f"Latitude: {latitude}, Longitude: {longitude}")
         
         # Define a proper origin, e.g., a specific address or coordinates
-        origin = "360 Huntington Ave, Boston, MA"  # Example: Google HQ
+        origin = "360 Huntington Ave, Boston, MA"  # Example: Northeastern University
         
         # URL encode the origin and destination
         origin_encoded = urllib.parse.quote(origin)
@@ -219,6 +225,7 @@ if page == "Login":
             st.session_state.user_id = user[0]
             st.session_state.page = "Queue Management"  # Redirect to Queue Management
             st.session_state.leave_requested = False  # Initialize leave request flag
+            st.session_state.status = None  # Reset status on new login
         else:
             st.error("Invalid username or password")
 
@@ -260,7 +267,6 @@ if st.session_state.get("authenticated", False) and st.session_state.page == "Qu
                     st.write(f"Queue number updated: {queue_number}")
                 if queue_number == 1:
                     st.success("It's your turn to leave!")
-                    update_user_status(st.session_state.user_id)  # Update user status to 'exited'
                     break
             
             # Ask for destination
@@ -270,8 +276,10 @@ if st.session_state.get("authenticated", False) and st.session_state.page == "Qu
                 navigation_link = get_navigation_link(destination)
                 if navigation_link:
                     st.write(f"Navigation Link: {navigation_link}")
+                    update_user_status(st.session_state.user_id)  # Update user status to 'exited' after navigation link is generated
 
     if st.button("Log Out"):
         st.session_state.authenticated = False
         st.session_state.page = "Login"
         st.session_state.leave_requested = False  # Reset leave request flag on logout
+        st.session_state.status = None  # Reset status on logout
