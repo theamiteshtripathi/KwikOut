@@ -3,7 +3,6 @@ import mysql.connector
 import googlemaps
 import time
 from dotenv import load_dotenv
-import urllib.parse
 import os
 
 # Load environment variables from .env file
@@ -78,11 +77,6 @@ st.markdown(
     footer {
         visibility: hidden;
     }
-    /* Styling for visible destination input */
-    .destination-input {
-        margin-top: 20px;
-        color: #000000; /* Ensure text is visible */
-    }
     </style>
     """,
     unsafe_allow_html=True
@@ -92,7 +86,7 @@ st.markdown(
 st.markdown(
     """
     <div class="center">
-        <img src="kwikout.png" alt="KwikOut Logo">
+        <img src="KwikOut.png" alt="KwikOut Logo">
     </div>
     """,
     unsafe_allow_html=True
@@ -134,11 +128,10 @@ def authenticate_user(username, password):
 def add_to_queue(user_id, zone):
     conn = create_connection()
     cursor = conn.cursor()
-    # Only consider users who are still waiting for the max queue number
-    cursor.execute("SELECT MAX(queue_number) FROM exit_queue WHERE zone = %s AND status = 'waiting'", (zone,))
+    cursor.execute("SELECT MAX(queue_number) FROM exit_queue WHERE zone = %s", (zone,))
     max_queue_number = cursor.fetchone()[0]
     next_queue_number = (max_queue_number or 0) + 1
-    cursor.execute("INSERT INTO exit_queue (user_id, queue_number, zone, status) VALUES (%s, %s, %s, 'waiting')", (user_id, next_queue_number, zone))
+    cursor.execute("INSERT INTO exit_queue (user_id, queue_number, zone) VALUES (%s, %s, %s)", (user_id, next_queue_number, zone))
     conn.commit()
     conn.close()
     return next_queue_number
@@ -152,57 +145,10 @@ def get_queue_status(user_id):
     conn.close()
     return queue_status
 
-# Function to update user's status to 'exited'
-def update_user_status(user_id):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE exit_queue SET status = 'exited' WHERE user_id = %s", (user_id,))
-    conn.commit()
-    conn.close()
-
+# Function to get the navigation link
 def get_navigation_link(destination):
-    try:
-        if not destination:
-            st.error("Destination cannot be empty.")
-            return None
-
-        # Get geocode result for the destination
-        geocode_result = gmaps.geocode(destination)
-        
-        if not geocode_result:
-            st.error("Location not found. Please check the destination input.")
-            return None
-        
-        # Extract latitude and longitude from the geocode result
-        location = geocode_result[0]['geometry']['location']
-        latitude = location['lat']
-        longitude = location['lng']
-        
-        # Log latitude and longitude for debugging
-        st.write(f"Latitude: {latitude}, Longitude: {longitude}")
-        
-        # Define a proper origin, e.g., a specific address or coordinates
-        origin = "360 Huntington Ave, Boston, MA"  # Example: Google HQ
-        
-        # URL encode the origin and destination
-        origin_encoded = urllib.parse.quote(origin)
-        destination_encoded = f"{latitude},{longitude}"
-        
-        # Generate the Google Maps URL with the origin and latitude,longitude destination
-        google_maps_url = f"https://www.google.com/maps/dir/?api=1&origin={origin_encoded}&destination={destination_encoded}&travelmode=driving"
-        
-        # Display the navigation link
-        st.markdown(f"[Click here for navigation]({google_maps_url})")
-        
-        return google_maps_url
-        
-    except googlemaps.exceptions.ApiError as e:
-        st.error(f"Google Maps API Error: {e}")
-        return None
-    except googlemaps.exceptions.HTTPError as e:
-        st.error(f"HTTP Error: {e}")
-        return None
-
+    directions = gmaps.directions("Current Location", destination)
+    return directions[0]['overview_polyline']['points']
 
 # Page Navigation
 page = st.sidebar.selectbox("Navigate", ["Login", "Sign Up"])
@@ -218,7 +164,6 @@ if page == "Login":
             st.session_state.authenticated = True
             st.session_state.user_id = user[0]
             st.session_state.page = "Queue Management"  # Redirect to Queue Management
-            st.session_state.leave_requested = False  # Initialize leave request flag
         else:
             st.error("Invalid username or password")
 
@@ -233,15 +178,10 @@ elif page == "Sign Up":
 # Queue Management Page
 if st.session_state.get("authenticated", False) and st.session_state.page == "Queue Management":
     st.markdown('<div class="header">Queue Management</div>', unsafe_allow_html=True)
-    
-    if not st.session_state.get("leave_requested", False):
-        zone = st.selectbox("Select your zone", ["A", "B", "C"])
-        if st.button("I want to leave"):
-            queue_number = add_to_queue(st.session_state.user_id, zone)
-            st.success(f"You are in queue. Your number is {queue_number}")
-            st.session_state.leave_requested = True  # Mark leave request as made
-    else:
-        st.warning("You have already requested to leave. Please wait for your turn.")
+    zone = st.selectbox("Select your zone", ["A", "B", "C"])
+    if st.button("I want to leave"):
+        queue_number = add_to_queue(st.session_state.user_id, zone)
+        st.success(f"You are in queue. Your number is {queue_number}")
 
     queue_status = get_queue_status(st.session_state.user_id)
     if queue_status:
@@ -260,18 +200,12 @@ if st.session_state.get("authenticated", False) and st.session_state.page == "Qu
                     st.write(f"Queue number updated: {queue_number}")
                 if queue_number == 1:
                     st.success("It's your turn to leave!")
-                    update_user_status(st.session_state.user_id)  # Update user status to 'exited'
+                    destination = st.text_input("Enter your destination")
+                    if st.button("Get Navigation"):
+                        navigation_link = get_navigation_link(destination)
+                        st.write(f"Navigation Link: {navigation_link}")
                     break
-            
-            # Ask for destination
-            st.markdown('<div class="destination-input">Enter your destination:</div>', unsafe_allow_html=True)
-            destination = st.text_input("Enter your destination", key="destination_input")
-            if st.button("Get Navigation"):
-                navigation_link = get_navigation_link(destination)
-                if navigation_link:
-                    st.write(f"Navigation Link: {navigation_link}")
 
     if st.button("Log Out"):
         st.session_state.authenticated = False
         st.session_state.page = "Login"
-        st.session_state.leave_requested = False  # Reset leave request flag on logout
