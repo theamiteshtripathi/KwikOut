@@ -1,4 +1,3 @@
-```markdown
 # KwikOut 🚗
 
 ![KwikOut Logo](KwikOut.png)
@@ -129,4 +128,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Project Maintainer**: Amitesh Tripathi, Aaquib Awais Shaikh, Hari Sai Kumar Gavara
 - **Email**: 1amiteshtripathi@gmail.com, aaquibs.0100@gmail.com, ghssaikumar09@gmail.com
 - **GitHub**: [theamiteshtripathi](https://github.com/theamiteshtripathi)
-```
+
