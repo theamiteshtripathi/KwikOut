@@ -1,60 +1,80 @@
-# Exit Management System
+```markdown
+# KwikOut 🚗
 
-## Overview
-The Exit Management System is a web application designed to manage the orderly exit of cars from large venues such as concert halls or sports stadiums. It helps reduce congestion and chaos by assigning queue numbers to users, indicating when they can leave, and providing navigation to their destinations.
+![KwikOut Logo](KwikOut.png)
+
+Welcome to **KwikOut**, an exit management system designed to streamline the process of leaving large events like concerts, sports venues, or any gathering where people exit en masse. KwikOut ensures an organized and efficient exit by assigning queue numbers to users, minimizing chaos, and providing navigation assistance to your destination.
 
 ## Features
-- User Signup and Login
-- Queue Management for Exiting Vehicles
-- Zone-based Exit Strategy
-- Real-time Queue Status Updates
-- Google Maps Integration for Navigation
+
+- **User Authentication**: Secure login and signup system using MySQL.
+- **Queue Management**: Real-time queue management that auto-decrements queue numbers, ensuring an orderly exit process.
+- **Google Maps Integration**: Once it's your turn to leave, KwikOut provides you with a navigation link to your destination using Google Maps.
+- **Explore Page**: Explore nearby restaurants and exclusive discount coupons before heading home.
+
+## How It Works
+
+1. **Sign Up / Log In**: Users can create an account or log in to their existing account.
+2. **Request to Leave**: Users can select their zone and request to leave, getting a queue number assigned to them.
+3. **Real-Time Updates**: Queue numbers auto-decrement in real time, notifying users when it's their turn to leave.
+4. **Destination Input**: After your queue number reaches 1, input your destination and receive a Google Maps navigation link.
+5. **Explore Nearby Restaurants**: Before heading out, check out nearby restaurants and discounts on the Explore page.
 
 ## Technologies Used
-- Python
-- Streamlit
-- MySQL
-- Google Maps API
 
-## Prerequisites
-- Python 3.x
-- MySQL
-- Google Maps API Key
+- **Python**: Main programming language.
+- **Streamlit**: Frontend framework for creating the interactive web application.
+- **MySQL**: Relational database for storing user information and queue data.
+- **Google Maps API**: Integration for generating navigation links to your desired destination.
+- **dotenv**: Securely load environment variables from a `.env` file.
 
 ## Installation
 
-### Step 1: Clone the Repository
-```bash
-git clone https://github.com/your-username/exit-management-system.git
-cd exit-management-system
-```
+### Prerequisites
 
-### Step 2: Install Dependencies
-```bash
-pip install -r requirements.txt
-```
+- **Python 3.x**
+- **MySQL**: Installed and configured.
+- **Google Maps API Key**: You will need a Google Maps API key for navigation functionality.
 
-### Step 3: Set Up MySQL Database
-1. **Start MySQL Server**:
+### Step-by-Step Guide
+
+1. **Clone the repository**:
+
    ```bash
-   sudo service mysql start
+   git clone https://github.com/yourusername/kwikout.git
+   cd kwikout
    ```
 
-2. **Log into MySQL**:
+2. **Install dependencies**:
+
    ```bash
-   mysql -u root -p
+   pip install -r requirements.txt
    ```
 
-3. **Create Database and Tables**:
+3. **Configure Environment Variables**:
+
+   Create a `.env` file in the project root and add your MySQL database credentials and Google Maps API key:
+
+   ```bash
+   DB_HOST=your_database_host
+   DB_USER=your_database_user
+   DB_PASSWORD=your_database_password
+   DB_NAME=your_database_name
+   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+   ```
+
+4. **Set Up MySQL Database**:
+
+   Open MySQL and run the following commands to set up the database and tables:
+
    ```sql
    CREATE DATABASE exit_management;
-
    USE exit_management;
 
    CREATE TABLE users (
        id INT AUTO_INCREMENT PRIMARY KEY,
-       username VARCHAR(50) UNIQUE NOT NULL,
-       password VARCHAR(255) NOT NULL
+       username VARCHAR(100) NOT NULL,
+       password VARCHAR(100) NOT NULL
    );
 
    CREATE TABLE exit_queue (
@@ -67,49 +87,46 @@ pip install -r requirements.txt
    );
    ```
 
-### Step 4: Get Google Maps API Key
-1. **Go to the [Google Cloud Console](https://console.cloud.google.com/)**.
-2. **Create a New Project**.
-3. **Enable the Google Maps API**.
-4. **Generate an API Key**.
-5. **Restrict the API Key (optional)**.
+5. **Run the Application**:
 
-### Step 5: Update Configuration
-1. **Replace the placeholders in `app.py` with your MySQL credentials and Google Maps API Key**:
-   ```python
-   gmaps = googlemaps.Client(key='YOUR_ACTUAL_GOOGLE_MAPS_API_KEY')
+   Launch the Streamlit application:
+
+   ```bash
+   streamlit run app.py
    ```
 
-2. **Replace `your_username` and `your_password` with your MySQL username and password**:
-   ```python
-   def create_connection():
-       return mysql.connector.connect(
-           host='localhost',
-           user='your_username',  # replace with your MySQL username
-           password='your_password',  # replace with your MySQL password
-           database='exit_management'
-       )
-   ```
+6. **Access the Application**:
 
-## Running the Application
-```bash
-streamlit run app.py
-```
-
-Open your web browser and go to [http://localhost:8501](http://localhost:8501).
+   Open your web browser and navigate to `http://localhost:8501` to start using KwikOut.
 
 ## Usage
-1. **Signup**: Create a new user account.
-2. **Login**: Log in with your credentials.
-3. **Join Queue**: Select your zone and join the exit queue.
-4. **Queue Status**: Monitor your queue status and wait for your turn.
-5. **Exit**: Follow the navigation link provided when it's your turn to exit.
+
+- **Login/Sign Up**: Start by logging in or signing up.
+- **Queue Management**: Request to leave, wait for your turn, and input your destination when it's time to go.
+- **Explore Nearby Restaurants**: Browse nearby restaurants with special offers before heading home.
+
+## Screenshots
+
+### Home Page
+![Home Page](screenshots/homepage.png)
+
+### Queue Management
+![Queue Management](screenshots/queuemanagement.png)
+
+### Explore Page
+![Explore Page](screenshots/Explore.jpeg)
 
 ## Contributing
-Contributions are welcome! Please fork the repository and submit a pull request.
+
+We welcome contributions to KwikOut! If you'd like to contribute, please fork the repository, make your changes, and submit a pull request.
 
 ## License
-This project is licensed under the MIT License.
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Contact
-For any inquiries or issues, please contact [your-email@example.com](mailto:your-email@example.com).
+
+- **Project Maintainer**: Amitesh Tripathi, Aaquib Awais Shaikh, Hari Sai Kumar Gavara
+- **Email**: 1amiteshtripathi@gmail.com, aaquibs.0100@gmail.com, ghssaikumar09@gmail.com
+- **GitHub**: [theamiteshtripathi](https://github.com/theamiteshtripathi)
+```
