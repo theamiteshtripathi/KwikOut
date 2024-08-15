@@ -1,6 +1,6 @@
 # KwikOut 🚗
 
-![KwikOut Logo](/KwikOut.png)
+![KwikOut Logo](assets/kwikoutlogo.png)
 
 Welcome to **KwikOut**, an exit management system designed to streamline the process of leaving large events like concerts, sports venues, or any gathering where people exit en masse. KwikOut ensures an organized and efficient exit by assigning queue numbers to users, minimizing chaos, and providing navigation assistance to your destination.
 
